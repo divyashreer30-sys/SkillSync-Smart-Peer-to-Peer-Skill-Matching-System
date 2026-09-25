@@ -1,9 +1,10 @@
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.awt.Desktop;
+import java.net.URI;
 
 public class SkillSync {
 
-    // Student class
     static class Student {
         int id;
         String name;
@@ -17,7 +18,6 @@ public class SkillSync {
         Student(int id, String name, int age, String department,
                 String skillKnown, String skillWanted,
                 double experience, String learningMode) {
-
             this.id = id;
             this.name = name;
             this.age = age;
@@ -34,13 +34,9 @@ public class SkillSync {
     static int nextId = 101;
 
     public static void main(String[] args) {
-
-        // Sample students for demonstration/testing.
-        // You can remove this method call if you want an empty system.
         addSampleStudents();
 
         int choice;
-
         do {
             displayMenu();
             choice = readInt("Enter your choice: ");
@@ -49,52 +45,48 @@ public class SkillSync {
                 case 1:
                     registerStudent();
                     break;
-
                 case 2:
                     viewStudentProfile();
                     break;
-
                 case 3:
                     findSkillMatch();
                     break;
-
                 case 4:
                     viewAllStudents();
                     break;
-
                 case 5:
+                    learningWebsite();
+                    break;
+                case 6:
                     System.out.println("\n========================================");
-                    System.out.println("Thank you for using SkillSync!");
-                    System.out.println("Keep Learning. Keep Sharing.!");
+                    System.out.println("       Thank you for using SkillSync!");
+                    System.out.println("       Learn • Share • Connect");
                     System.out.println("========================================");
                     break;
-
                 default:
-                    System.out.println("\nInvalid choice! Please enter 1 to 5.");
+                    System.out.println("\nInvalid choice! Please enter 1 to 6.");
             }
-
-        } while (choice != 5);
+        } while (choice != 6);
 
         sc.close();
     }
 
-    // Display main menu
     static void displayMenu() {
         System.out.println("\n========================================");
         System.out.println("              SkillSync");
         System.out.println(" Smart Peer-to-Peer Skill Matching System");
+        System.out.println("        Learn • Share • Connect");
         System.out.println("========================================");
         System.out.println("1. Register Student");
         System.out.println("2. View Student Profile");
         System.out.println("3. Find Skill Match");
         System.out.println("4. View All Students");
-        System.out.println("5. Exit");
+        System.out.println("5. Open Learning Website");
+        System.out.println("6. Exit");
         System.out.println("========================================");
     }
 
-    // Register a new student
     static void registerStudent() {
-
         System.out.println("\n--------- STUDENT REGISTRATION ---------");
 
         String name = readNonEmptyString("Enter Student Name: ");
@@ -105,16 +97,8 @@ public class SkillSync {
         double experience = readNonNegativeDouble("Enter Experience (in years): ");
         String learningMode = readLearningMode();
 
-        Student student = new Student(
-                nextId,
-                name,
-                age,
-                department,
-                skillKnown,
-                skillWanted,
-                experience,
-                learningMode
-        );
+        Student student = new Student(nextId, name, age, department,
+                skillKnown, skillWanted, experience, learningMode);
 
         students.add(student);
 
@@ -126,9 +110,7 @@ public class SkillSync {
         nextId++;
     }
 
-    // View one student profile
     static void viewStudentProfile() {
-
         if (students.isEmpty()) {
             System.out.println("\nNo students registered yet.");
             return;
@@ -147,9 +129,7 @@ public class SkillSync {
         displayFullProfile(student);
     }
 
-    // Find the best skill match
     static void findSkillMatch() {
-
         if (students.size() < 2) {
             System.out.println("\nAt least 2 students are required to find a match.");
             return;
@@ -169,7 +149,6 @@ public class SkillSync {
         int bestScore = 0;
 
         for (Student other : students) {
-
             if (other.id == current.id) {
                 continue;
             }
@@ -186,45 +165,35 @@ public class SkillSync {
             System.out.println("\n========================================");
             System.out.println("          NO SUITABLE MATCH");
             System.out.println("========================================");
-            System.out.println("No student currently matches your skill");
-            System.out.println("requirements.");
-            System.out.println("Try again after more students register.");
+            System.out.println("No student currently matches your");
+            System.out.println("skill requirements.");
             return;
         }
 
         displayMatch(current, bestMatch, bestScore);
     }
 
-    // Calculate matching score
     static int calculateMatchScore(Student current, Student other) {
-
         int score = 0;
 
         String currentWanted = normalize(current.skillWanted);
         String currentKnown = normalize(current.skillKnown);
-
         String otherKnown = normalize(other.skillKnown);
         String otherWanted = normalize(other.skillWanted);
 
-        // Main condition:
-        // Other student knows the skill current student wants.
         if (isSkillMatch(currentWanted, otherKnown)) {
             score += 60;
         }
 
-        // Mutual exchange:
-        // Current student knows the skill other student wants.
         if (isSkillMatch(otherWanted, currentKnown)) {
             score += 30;
         }
 
-        // Same learning mode
         if (normalize(current.learningMode)
                 .equals(normalize(other.learningMode))) {
             score += 5;
         }
 
-        // Same department
         if (normalize(current.department)
                 .equals(normalize(other.department))) {
             score += 5;
@@ -233,9 +202,7 @@ public class SkillSync {
         return Math.min(score, 100);
     }
 
-    // Display matching result
     static void displayMatch(Student current, Student match, int score) {
-
         System.out.println("\n========================================");
         System.out.println("          SKILL MATCH FOUND!");
         System.out.println("========================================");
@@ -257,6 +224,7 @@ public class SkillSync {
         System.out.println("\nMatch Score   : " + score + "%");
 
         System.out.println("\nWhy this match?");
+
         boolean firstReason = true;
 
         if (isSkillMatch(current.skillWanted, match.skillKnown)) {
@@ -288,6 +256,7 @@ public class SkillSync {
         }
 
         System.out.println("\nRecommendation:");
+
         if (score >= 90) {
             System.out.println("Excellent match! You can learn from each other.");
         } else if (score >= 60) {
@@ -297,11 +266,78 @@ public class SkillSync {
         }
 
         System.out.println("========================================");
+
+        // Website option after finding a match
+        System.out.print("\nOpen website to learn "
+                + current.skillWanted + "? (yes/no): ");
+
+        String answer = sc.nextLine();
+
+        if (answer.equalsIgnoreCase("yes")) {
+            openSkillWebsite(current.skillWanted);
+        } else {
+            System.out.println("Website not opened.");
+        }
     }
 
-    // View all registered students
-    static void viewAllStudents() {
+    // Opens a real learning website based on the required skill
+    static void openSkillWebsite(String skill) {
 
+        String url;
+
+        if (skill.equalsIgnoreCase("Java")) {
+            url = "https://www.w3schools.com/java/";
+        } else if (skill.equalsIgnoreCase("Python")) {
+            url = "https://www.w3schools.com/python/";
+        } else if (skill.equalsIgnoreCase("SQL")) {
+            url = "https://www.w3schools.com/sql/";
+        } else if (skill.equalsIgnoreCase("HTML")) {
+            url = "https://www.w3schools.com/html/";
+        } else if (skill.equalsIgnoreCase("CSS")) {
+            url = "https://www.w3schools.com/css/";
+        } else if (skill.equalsIgnoreCase("JavaScript")) {
+            url = "https://www.w3schools.com/js/";
+        } else {
+            url = "https://www.google.com/search?q="
+                    + skill.replace(" ", "+") + "+tutorial";
+        }
+
+        System.out.println("\n----------------------------------------");
+        System.out.println("        🌐 LEARNING WEBSITE");
+        System.out.println("----------------------------------------");
+        System.out.println("Skill : " + skill);
+        System.out.println("Link  : " + url);
+        System.out.println("----------------------------------------");
+        System.out.println("Opening website in your browser...");
+
+        try {
+            if (Desktop.isDesktopSupported()
+                    && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+
+                Desktop.getDesktop().browse(new URI(url));
+
+                System.out.println("✓ Website opened successfully!");
+            } else {
+                System.out.println("Browser opening is not supported.");
+            }
+        } catch (Exception e) {
+            System.out.println("Unable to open website automatically.");
+            System.out.println("Please open the link manually.");
+        }
+    }
+
+    // Separate learning website option
+    static void learningWebsite() {
+
+        System.out.println("\n--------- LEARNING WEBSITE ---------");
+
+        String skill = readNonEmptyString(
+                "Enter Skill (Java/Python/SQL/HTML/CSS/JavaScript): ");
+
+        openSkillWebsite(skill);
+    }
+
+    static void viewAllStudents() {
         if (students.isEmpty()) {
             System.out.println("\nNo students registered yet.");
             return;
@@ -327,9 +363,7 @@ public class SkillSync {
         System.out.println("Total Students: " + students.size());
     }
 
-    // Display full profile
     static void displayFullProfile(Student student) {
-
         System.out.println("\n--------- STUDENT PROFILE ---------");
         System.out.println("Student ID        : " + student.id);
         System.out.println("Name              : " + student.name);
@@ -342,35 +376,24 @@ public class SkillSync {
         System.out.println("-----------------------------------");
     }
 
-    // Find student using ID
     static Student findStudentById(int id) {
-
         for (Student student : students) {
             if (student.id == id) {
                 return student;
             }
         }
-
         return null;
     }
 
-    // Check whether two skill names match
     static boolean isSkillMatch(String skill1, String skill2) {
-
-        String a = normalize(skill1);
-        String b = normalize(skill2);
-
-        return a.equals(b);
+        return normalize(skill1).equals(normalize(skill2));
     }
 
-    // Normalize input to make matching case-insensitive
     static String normalize(String text) {
         return text.trim().toLowerCase();
     }
 
-    // Read non-empty text
     static String readNonEmptyString(String message) {
-
         while (true) {
             System.out.print(message);
             String value = sc.nextLine().trim();
@@ -383,9 +406,7 @@ public class SkillSync {
         }
     }
 
-    // Read integer safely
     static int readInt(String message) {
-
         while (true) {
             System.out.print(message);
             String input = sc.nextLine().trim();
@@ -398,9 +419,7 @@ public class SkillSync {
         }
     }
 
-    // Read positive integer
     static int readPositiveInt(String message) {
-
         while (true) {
             int value = readInt(message);
 
@@ -412,9 +431,7 @@ public class SkillSync {
         }
     }
 
-    // Read non-negative double
     static double readNonNegativeDouble(String message) {
-
         while (true) {
             System.out.print(message);
             String input = sc.nextLine().trim();
@@ -434,16 +451,13 @@ public class SkillSync {
         }
     }
 
-    // Read learning mode
     static String readLearningMode() {
-
         while (true) {
             System.out.print("Enter Preferred Learning Mode (Online/Offline): ");
             String mode = sc.nextLine().trim();
 
             if (mode.equalsIgnoreCase("Online")
                     || mode.equalsIgnoreCase("Offline")) {
-
                 return capitalizeFirstLetter(mode);
             }
 
@@ -451,9 +465,7 @@ public class SkillSync {
         }
     }
 
-    // Capitalize first letter
     static String capitalizeFirstLetter(String text) {
-
         if (text == null || text.isEmpty()) {
             return text;
         }
@@ -462,9 +474,7 @@ public class SkillSync {
                 + text.substring(1).toLowerCase();
     }
 
-    // Sample data
     static void addSampleStudents() {
-
         students.add(new Student(
                 nextId++, "Priya", 21, "CSE",
                 "Python", "Java", 2.0, "Online"
@@ -481,3 +491,4 @@ public class SkillSync {
         ));
     }
 }
+
